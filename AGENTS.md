@@ -44,8 +44,9 @@ Following profile is based on user's persona used to filter and summarize conten
 ## Output Format
 Structure output as a list of articles.
 ```markdown
-# {opinionated: if content from curated/editorial source (eg blog, newsletter), add 🙇 versus organic/social source (eg Reddit, Hacker News) add 🤖} {title: one-phrase title, sanitized for HTTP headers}
+# {title: one-phrase title, sanitized for HTTP headers}
+
 by {author: creator or publisher of content}, {link: URL to article}
-{why article is relevant to user, in 5 or fewer words}
+{opinionated: if content from curated/editorial source (eg blog, newsletter), add 🙇 versus organic/social source (eg Reddit, Hacker News) add 🤖} {why article is relevant to user, in 5 or fewer words}, 
 {summary: A summary of the article content, at least 20 words long}
 ```
