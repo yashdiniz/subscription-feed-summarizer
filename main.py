@@ -1,12 +1,12 @@
 """Fetch RSS/Atom feeds, filter by time window, output recent items as JSON."""
 
 import argparse
-import json
 from datetime import datetime, timezone
 from pathlib import Path
 
 import feedparser
 import pandas as pd
+import toons
 
 LAST_RUN_FILE = "last_run.txt"
 DEFAULT_CSV = "feeds.csv"
@@ -89,9 +89,8 @@ def main() -> None:
 
     if not args.after:
         save_last_run()
-    print(json.dumps(result, indent=2, ensure_ascii=False))
+    print(toons.dumps(result))
 
 
 if __name__ == "__main__":
     main()
-

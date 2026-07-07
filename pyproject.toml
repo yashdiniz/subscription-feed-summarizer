@@ -4,4 +4,8 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = ["feedparser>=6.0", "pandas>=2.0"]
+dependencies = [
+    "feedparser>=6.0",
+    "pandas>=2.0",
+    "toons>=0.7.0",
+]
