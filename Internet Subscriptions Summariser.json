@@ -1,0 +1,1427 @@
+{
+  "name": "Internet Subscriptions Summariser",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 3
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        1968,
+        -256
+      ],
+      "id": "180af6cd-f6b0-4656-a56c-45040a0cbd09",
+      "name": "Hourly trigger",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        2400,
+        -256
+      ],
+      "id": "fbafb3b1-dff6-4411-85a9-c404add6b49c",
+      "name": "RSS Feed",
+      "retryOnFail": false,
+      "waitBetweenTries": 5000,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "tN7ZfWFQxxc5iNiK",
+          "mode": "list",
+          "cachedResultName": "feeds",
+          "cachedResultUrl": "/projects/Qmg6lgzLnF3MfOPk/datatables/tN7ZfWFQxxc5iNiK"
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        2112,
+        -256
+      ],
+      "id": "98a06ecc-0b56-4a2c-9ce2-7db55c0b322e",
+      "name": "Get row(s)"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c1d45902-07bb-47b4-b525-6ed3be4ef52a",
+              "leftValue": "={{ $json.isoDate ?? $json.pubDate }}",
+              "rightValue": "={{ new Date(new Date($('Get row(s)').item.json.last_triggered) - 300 * 1000) }}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "afterOrEquals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        2544,
+        -256
+      ],
+      "id": "6e81df7e-845b-4758-8a61-02591a668a26",
+      "name": "Keep recent"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "tN7ZfWFQxxc5iNiK",
+          "mode": "list",
+          "cachedResultName": "feeds",
+          "cachedResultUrl": "/projects/Qmg6lgzLnF3MfOPk/datatables/tN7ZfWFQxxc5iNiK"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "={{ $('Get row(s)').item.json.id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "last_triggered": "={{ $now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "url",
+              "displayName": "url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "last_triggered",
+              "displayName": "last_triggered",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "active",
+              "displayName": "active",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        2592,
+        192
+      ],
+      "id": "38feead3-346c-4a2b-a265-62b290166478",
+      "name": "Update row(s)"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyWeek",
+              "hour": 9,
+              "minute": 4,
+              "weekday": "3"
+            }
+          ]
+        },
+        "feedUrl": "https://old.reddit.com/r/devops/hot.rss"
+      },
+      "type": "n8n-nodes-base.rssFeedReadTrigger",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        -32
+      ],
+      "id": "44c770e4-7107-427f-b11b-6f33605a0a32",
+      "name": "r/devops hot",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "hour": 9,
+              "minute": 15
+            }
+          ]
+        },
+        "feedUrl": "https://hnrss.org/best"
+      },
+      "type": "n8n-nodes-base.rssFeedReadTrigger",
+      "typeVersion": 1,
+      "position": [
+        1968,
+        0
+      ],
+      "id": "14b5a940-b20b-48f6-a68e-118c92b649b3",
+      "name": "HN best"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyWeek",
+              "hour": 9,
+              "minute": 2,
+              "weekday": "2"
+            }
+          ]
+        },
+        "feedUrl": "https://old.reddit.com/r/softwarearchitecture/hot.rss"
+      },
+      "type": "n8n-nodes-base.rssFeedReadTrigger",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        -160
+      ],
+      "id": "477923d9-b5ef-4ff2-b348-ec69c576e14b",
+      "name": "r/softwarearchitecture hot",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyWeek",
+              "hour": 9
+            }
+          ]
+        },
+        "feedUrl": "https://old.reddit.com/r/PromptEngineering/hot.rss"
+      },
+      "type": "n8n-nodes-base.rssFeedReadTrigger",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        -288
+      ],
+      "id": "7fd21e37-ce58-4b38-8b21-af78011d97bd",
+      "name": "r/PromptEngineering hot",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyWeek",
+              "hour": 9,
+              "minute": 6,
+              "weekday": "4"
+            }
+          ]
+        },
+        "feedUrl": "https://old.reddit.com/r/Biohackers/hot.rss"
+      },
+      "type": "n8n-nodes-base.rssFeedReadTrigger",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        96
+      ],
+      "id": "6a960053-fb03-48eb-899a-c7a205f0fd96",
+      "name": "r/Biohackers hot",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyWeek",
+              "hour": 9,
+              "minute": 8,
+              "weekday": "5"
+            }
+          ]
+        },
+        "feedUrl": "https://old.reddit.com/r/ZenHabits/hot.rss"
+      },
+      "type": "n8n-nodes-base.rssFeedReadTrigger",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        224
+      ],
+      "id": "cde6d025-7ed9-4a15-949c-9b08afe64467",
+      "name": "r/ZenHabits hot",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "numberInputs": 6
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1696,
+        -192
+      ],
+      "id": "90762cc1-9ff8-486a-a0af-fe26b217fe3e",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=I'm Yash, a 26 year old man born on Christmas day! Interested in backend engineering and architecture, software design, data engineering, linux/DevOps, AI, integration & optimization. I work at Blue Altair.\n\nRecently exploring homelabs (including any new self-hosted product or service), biohacking, diet, fitness, neuroscience, workflows & automation, business (Hormozi/Naval/YCombinator/CEO type content), Catholicism/Christianity/Stoicism, energy management, mental health and entrepreneurship.\n\nOpen to new ideas, and always learning! I also like reading opinionated articles.\n\nHere's today's hot news. Summarize!\n{{ $json.data }}",
+        "hasOutputParser": true,
+        "needsFallback": true,
+        "options": {
+          "maxIterations": 2
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        2944,
+        0
+      ],
+      "id": "cbdafff5-9fd8-4fae-8dfe-0597803f3b2d",
+      "name": "AI Agent",
+      "alwaysOutputData": false,
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "maxTries": 5,
+      "notes": "{\n  \"type\": \"array\",\n  \"items\": [\n    {\n      \"type\": \"object\",\n      \"properties\": {\n        \"link\": {\n          \"type\": \"string\"\n        },\n        \"author\": {\n          \"type\": \"string\"\n        },\n        \"title\": {\n          \"type\": \"string\"\n        },\n        \"summary\": {\n          \"type\": \"string\"\n        },\n        \"relevant\": {\n          \"type\": \"boolean\"\n        }\n      }\n    }\n  ]\n}"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "output",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        3824,
+        80
+      ],
+      "id": "44d75194-93bd-4c74-b39e-003ebc5a2a85",
+      "name": "Collect the garbage"
+    },
+    {
+      "parameters": {
+        "model": "meta-llama/llama-4-scout-17b-16e-instruct",
+        "options": {
+          "maxTokensToSample": 4096
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        2944,
+        192
+      ],
+      "id": "55717fe1-257e-45ee-9d43-9c480a0cc71d",
+      "name": "Llama 4",
+      "credentials": {
+        "groqApi": {
+          "id": "4zVtQaYh6giY6Ry1",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "OTgjZNbZApeh080g",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/OTgjZNbZApeh080g",
+          "cachedResultName": "Send to NTFY"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "summary": "={{ $json.output.text }}",
+            "tags": "={{ ['robot', 'wastebasket'] }}",
+            "priority": "low",
+            "title": "Compacted garbage",
+            "link": "=https://n8n.yashdiniz.me/workflow/rrHE4u9IpwxVh1np/executions/{{ $execution.id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "link",
+              "displayName": "link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "summary",
+              "displayName": "summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "tags",
+              "displayName": "tags",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "array",
+              "removed": false
+            },
+            {
+              "id": "priority",
+              "displayName": "priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        4368,
+        80
+      ],
+      "id": "96ac3054-f342-42c9-84d6-850f20a794d9",
+      "name": "NTFY Summary"
+    },
+    {
+      "parameters": {
+        "chunkSize": 4096,
+        "chunkOverlap": 50,
+        "options": {
+          "summarizationMethodAndPrompts": {
+            "values": {
+              "summarizationMethod": "stuff",
+              "prompt": "Write a concise summary of the following, match the number of items provided in input to the number of bullet points in output. Use markdown format to include the link for each corresponding summary bullet point, like [summary](url). For example, [Create useful diagrams using code](https://mermaid.live). No extra prose or filler:\n\n\n\"{text}\"\n\n\nCONCISE SUMMARY:"
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainSummarization",
+      "typeVersion": 2.1,
+      "position": [
+        4032,
+        80
+      ],
+      "id": "0054a9ee-75c8-4301-a9b9-c2ed74c05e64",
+      "name": "Summarization Chain"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "OTgjZNbZApeh080g",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/OTgjZNbZApeh080g",
+          "cachedResultName": "Send to NTFY"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "title": "={{ $json.author }}: {{ $json.title.replaceAll(/[\\u2018\\u2019\\u201C\\u201D\\u2012\\u2013\\u2014]/g, function(m) {\n    return {\"\\u2018\": \"'\", \"\\u2019\": \"'\",\n\"\\u201C\":\"\\\"\", \"\\u201D\": \"\\\"\",\n\"\\u2012\": \"-\", \"\\u2013\": \"-\", \"\\u2014\": \"-\"}[m];\n}) }}",
+            "link": "={{ $json.link }}",
+            "summary": "={{ $json.summary }}",
+            "tags": "={{ ['robot', 'heavy_check_mark', ...($json.opinionated ? ['star'] : [])] }}",
+            "priority": "default"
+          },
+          "matchingColumns": [
+            "title",
+            "link",
+            "summary"
+          ],
+          "schema": [
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "link",
+              "displayName": "link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "summary",
+              "displayName": "summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "tags",
+              "displayName": "tags",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "array",
+              "removed": false
+            },
+            {
+              "id": "priority",
+              "displayName": "priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        3824,
+        -80
+      ],
+      "name": "Call Send to NTFY",
+      "id": "96b08f71-e88f-48f5-b8a0-4a2e51fc859d"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "output",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        3472,
+        0
+      ],
+      "id": "6d64610e-e0a6-4cdd-acc2-81f2b70122bc",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "jsCode": "return { \n  data: $input.all()\n  .map(v => ({    // map all input data to required data structure\n    title: v.json.title,\n    link: v.json.link,\n    author: v.json.author ?? v.json.creator,\n    summary: v.json.contentSnippet,\n    published: v.json.isoDate,\n  }))\n  .sort((a, b) => new Date(b.published).getTime() - new Date(a.published).getTime()) // sort by latest\n  .slice(0,50),  // limit to first 50 items\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2592,
+        0
+      ],
+      "id": "40d81aa2-c8a1-425b-9c64-4403d9ed53bd",
+      "name": "map-sort-limit-aggregate"
+    },
+    {
+      "parameters": {
+        "additionalOptions": {}
+      },
+      "type": "@tehw0lf/n8n-nodes-toon.toon",
+      "typeVersion": 1,
+      "position": [
+        2736,
+        0
+      ],
+      "id": "4b5cd4ac-35fb-485a-92f8-32576b09e5dc",
+      "name": "TOON"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n  \"title\": \"ArticleList\",\n  \"description\": \"A list of articles ordered by relevance and source type with specific formatting constraints. No extra prose or filler, no HTML/XML. Summarize all of the data the user shares, do not add anything extra and do not remove anything from what user provides.\",\n  \"type\": \"array\",\n  \"items\": {\n    \"type\": \"object\",\n    \"properties\": {\n      \"link\": {\n        \"type\": \"string\",\n        \"format\": \"uri\",\n        \"description\": \"The URL to the article.\"\n      },\n      \"author\": {\n        \"type\": \"string\",\n        \"description\": \"The creator or publisher of the content.\"\n      },\n      \"title\": {\n        \"type\": \"string\",\n        \"description\": \"One phrase, sanitized for HTTP headers (remember to HTTP escape this field value!).\"\n      },\n      \"summary\": {\n        \"type\": \"string\",\n        \"description\": \"Summary of the article content. Must be at least 20 words.\"\n      },\n      \"relevant\": {\n        \"type\": \"boolean\",\n        \"description\": \"Determines if the news matches user shared interests.\"\n      },\n      \"opinionated\": {\n        \"type\": \"boolean\",\n        \"description\": \"True if from curated/editorial sources (e.g., Slashdot, Ars Technica); False if from organic/social sources (e.g., Reddit, GitHub, LinkedIn).\"\n      }\n    },\n    \"required\": [\n      \"link\",\n      \"author\",\n      \"title\",\n      \"summary\",\n      \"relevant\",\n      \"opinionated\"\n    ],\n    \"additionalProperties\": false\n  }\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        3136,
+        192
+      ],
+      "id": "d4adb256-1c4b-42e3-97e8-533816eea830",
+      "name": "Structured Output Parser",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 200
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "84e9cdff-b596-4d6e-8510-5cbfe51c904f",
+              "leftValue": "={{ $json.active }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        2256,
+        -256
+      ],
+      "id": "d5eb583f-7f5f-4287-8e1a-15a8f271219e",
+      "name": "Keep active rows"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "51166fdb-20f6-418c-ab34-2e4b68cf110e",
+              "leftValue": "={{ $json.relevant }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        3616,
+        -80
+      ],
+      "id": "694d0cfc-3399-49a4-9864-0ffac2ddefd7",
+      "name": "Keep Relevant"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "51166fdb-20f6-418c-ab34-2e4b68cf110e",
+              "leftValue": "={{ $json.relevant }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        3616,
+        80
+      ],
+      "id": "028845d4-ad93-47b2-a12b-e2be8f5159a8",
+      "name": "Keep Discarded"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {
+          "maxTokensToSample": 4096
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        3584,
+        272
+      ],
+      "id": "1452f5a7-8028-441b-bbb7-e9688289f93d",
+      "name": "Llama 3.3",
+      "credentials": {
+        "groqApi": {
+          "id": "4zVtQaYh6giY6Ry1",
+          "name": "Groq account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "r/softwarearchitecture hot": [
+      {
+        "json": {
+          "title": "AMA with Simon Brown, creator of the C4 model & Structurizr",
+          "link": "https://old.reddit.com/r/softwarearchitecture/comments/1oos3oe/ama_with_simon_brown_creator_of_the_c4_model/",
+          "pubDate": "2025-11-05T03:19:16.000Z",
+          "author": "/u/asdfdelta",
+          "content": "<!-- SC_OFF --><div class=\"md\"><p><a href=\"https://preview.redd.it/k3p7cp5qvnzf1.jpg?width=5712&amp;format=pjpg&amp;auto=webp&amp;s=04aaced31046175070f54c44b9b6972f057f6611\">https://preview.redd.it/k3p7cp5qvnzf1.jpg?width=5712&amp;format=pjpg&amp;auto=webp&amp;s=04aaced31046175070f54c44b9b6972f057f6611</a></p> <p>Hey everyone!</p> <p>I&#39;d like to extend a welcome to the legendary Simon Brown, award winning creator and author of the C4 model, founder of Structurizr, and overall champion of Architecture.</p> <p>On November 18th, join us for an AMA and ask the legend about anything software-related, such as:</p> <p>- Visualizing software</p> <p>- Architecture for Engineering teams</p> <p>- Speaking</p> <p>- Software Design</p> <p>- Modular Monoliths</p> <p>- DevOps</p> <p>- Agile</p> <p>- And more!</p> <p>Be sure to check out his website (<a href=\"https://simonbrown.je/\">https://simonbrown.je/</a>) and the C4 Model (<a href=\"https://c4model.com/\">https://c4model.com/</a>) to see what he&#39;s speaking about lately.</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://old.reddit.com/user/asdfdelta\"> /u/asdfdelta </a> <br/> <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1oos3oe/ama_with_simon_brown_creator_of_the_c4_model/\">[link]</a></span> &#32; <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1oos3oe/ama_with_simon_brown_creator_of_the_c4_model/\">[comments]</a></span>",
+          "contentSnippet": "https://preview.redd.it/k3p7cp5qvnzf1.jpg?width=5712&format=pjpg&auto=webp&s=04aaced31046175070f54c44b9b6972f057f6611\n Hey everyone!\n I'd like to extend a welcome to the legendary Simon Brown, award winning creator and author of the C4 model, founder of Structurizr, and overall champion of Architecture.\n On November 18th, join us for an AMA and ask the legend about anything software-related, such as:\n - Visualizing software\n - Architecture for Engineering teams\n - Speaking\n - Software Design\n - Modular Monoliths\n - DevOps\n - Agile\n - And more!\n Be sure to check out his website (https://simonbrown.je/) and the C4 Model (https://c4model.com/) to see what he's speaking about lately.\n    submitted by    /u/asdfdelta  \n [link]   [comments]",
+          "id": "t3_1oos3oe",
+          "isoDate": "2025-11-05T03:19:16.000Z"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "title": "We’ve given up on keeping our initial arch docs up to date. Should I worry? Or are we setting ourselves up for pain later?",
+          "link": "https://old.reddit.com/r/softwarearchitecture/comments/1qmw7bi/weve_given_up_on_keeping_our_initial_arch_docs_up/",
+          "pubDate": "2026-01-25T21:34:34.000Z",
+          "author": "/u/Independent-Run-4364",
+          "content": "<!-- SC_OFF --><div class=\"md\"><p>At my current team, we started out with decent arch docs “how the system works” pages. But then we shipped for a few weeks, priorities changed, a couple of us made small exceptions and now we don&#39;t use them anymore and they r lost in time.</p> <p>As the one who’s supposed to keep things running long term, I’m not sure if this is just normal and harmless, or if it&#39;s gonna hurt us later.</p> <p>If you’ve been in this situation: should we just accept it? If not when could it start to cause problems?</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://old.reddit.com/user/Independent-Run-4364\"> /u/Independent-Run-4364 </a> <br/> <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qmw7bi/weve_given_up_on_keeping_our_initial_arch_docs_up/\">[link]</a></span> &#32; <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qmw7bi/weve_given_up_on_keeping_our_initial_arch_docs_up/\">[comments]</a></span>",
+          "contentSnippet": "At my current team, we started out with decent arch docs “how the system works” pages. But then we shipped for a few weeks, priorities changed, a couple of us made small exceptions and now we don't use them anymore and they r lost in time.\n As the one who’s supposed to keep things running long term, I’m not sure if this is just normal and harmless, or if it's gonna hurt us later.\n If you’ve been in this situation: should we just accept it? If not when could it start to cause problems?\n    submitted by    /u/Independent-Run-4364  \n [link]   [comments]",
+          "id": "t3_1qmw7bi",
+          "isoDate": "2026-01-25T21:34:34.000Z"
+        },
+        "pairedItem": {
+          "item": 1
+        }
+      },
+      {
+        "json": {
+          "title": "Self Referencing Tables vs Closure Tables - Which one would you choose",
+          "link": "https://old.reddit.com/r/softwarearchitecture/comments/1qmr85v/self_referencing_tables_vs_closure_tables_which/",
+          "pubDate": "2026-01-25T18:34:41.000Z",
+          "author": "/u/LiveAccident5312",
+          "content": "<!-- SC_OFF --><div class=\"md\"><p>I&#39;m trying to create a schema design for large scale multi purpose e-commerce platform and while creating &quot;categories&quot; relation I found out that categories are hard to manage because products can have indefinite depth of sub-categories (such as, for Tshirts it can be Apparel -&gt; Men -&gt; Tshirts but for laptops it can be Electronics -&gt; Laptops). So to solve this problem I&#39;ve found two solutions-</p> <ol> <li><p>using self referencing tables and creating infinite category depth by referencing to parent category</p></li> <li><p>using clouser table to add ancestor_id and descent_id to each category with the depth value.</p></li> </ol> <p>Both solutions come with its own advantages and drawbacks. What&#39;s your suggestion? Also it would be great if anyone can share his/her experience designing a practical ecommerce database schema.</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://old.reddit.com/user/LiveAccident5312\"> /u/LiveAccident5312 </a> <br/> <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qmr85v/self_referencing_tables_vs_closure_tables_which/\">[link]</a></span> &#32; <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qmr85v/self_referencing_tables_vs_closure_tables_which/\">[comments]</a></span>",
+          "contentSnippet": "I'm trying to create a schema design for large scale multi purpose e-commerce platform and while creating \"categories\" relation I found out that categories are hard to manage because products can have indefinite depth of sub-categories (such as, for Tshirts it can be Apparel -> Men -> Tshirts but for laptops it can be Electronics -> Laptops). So to solve this problem I've found two solutions-\n  \nusing self referencing tables and creating infinite category depth by referencing to parent category\n \nusing clouser table to add ancestor_id and descent_id to each category with the depth value.\n \n Both solutions come with its own advantages and drawbacks. What's your suggestion? Also it would be great if anyone can share his/her experience designing a practical ecommerce database schema.\n    submitted by    /u/LiveAccident5312  \n [link]   [comments]",
+          "id": "t3_1qmr85v",
+          "isoDate": "2026-01-25T18:34:41.000Z"
+        },
+        "pairedItem": {
+          "item": 2
+        }
+      },
+      {
+        "json": {
+          "title": "Problem designing rule interface",
+          "link": "https://old.reddit.com/r/softwarearchitecture/comments/1qmwhjz/problem_designing_rule_interface/",
+          "pubDate": "2026-01-25T21:45:11.000Z",
+          "author": "/u/daviscott7",
+          "content": "<!-- SC_OFF --><div class=\"md\"><p>I’m working on an open source American football simulation engine called Pylon, and I’m looking for some architectural guidance.</p> <p>The core design goal is that the simulation engine should be decision agnostic: it never chooses plays, players, yardage, clock behavior, etc. All decisions come from user supplied models. The engine’s job is only to apply those decisions and advance the game state.</p> <p>Right now I’m trying to finalize the interface between three pieces:</p> <p>LeagueRules — pure rule logic (e.g., when drives end, how kickoffs work, scoring values). It should decide but never mutate state.</p> <p>GameState — the authoritative live state of the game.</p> <p>GameStateUpdater — the only component allowed to mutate GameState.</p> <p>My challenge is figuring out the cleanest way for LeagueRules to express “what should happen next” without directly touching/mutating GameState. I’m leaning toward returning “decision objects” (e.g., PlayEndDecision, DriveEndDecision, KickoffSetup, ExtraPointSetup) that the updater then applies, but I want to make sure I’m not missing a better pattern.</p> <p>If anyone has experience designing simulation engines, rule engines, or state machines, especially where rules must be pure and mutations centralized I’d love your thoughts. The repo is here if you want context:</p> <p><a href=\"https://github.com/dcott7/pylon\">https://github.com/dcott7/pylon</a></p> <p>Happy to answer questions. Any architectural advice is appreciated.</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://old.reddit.com/user/daviscott7\"> /u/daviscott7 </a> <br/> <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qmwhjz/problem_designing_rule_interface/\">[link]</a></span> &#32; <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qmwhjz/problem_designing_rule_interface/\">[comments]</a></span>",
+          "contentSnippet": "I’m working on an open source American football simulation engine called Pylon, and I’m looking for some architectural guidance.\n The core design goal is that the simulation engine should be decision agnostic: it never chooses plays, players, yardage, clock behavior, etc. All decisions come from user supplied models. The engine’s job is only to apply those decisions and advance the game state.\n Right now I’m trying to finalize the interface between three pieces:\n LeagueRules — pure rule logic (e.g., when drives end, how kickoffs work, scoring values). It should decide but never mutate state.\n GameState — the authoritative live state of the game.\n GameStateUpdater — the only component allowed to mutate GameState.\n My challenge is figuring out the cleanest way for LeagueRules to express “what should happen next” without directly touching/mutating GameState. I’m leaning toward returning “decision objects” (e.g., PlayEndDecision, DriveEndDecision, KickoffSetup, ExtraPointSetup) that the updater then applies, but I want to make sure I’m not missing a better pattern.\n If anyone has experience designing simulation engines, rule engines, or state machines, especially where rules must be pure and mutations centralized I’d love your thoughts. The repo is here if you want context:\n https://github.com/dcott7/pylon\n Happy to answer questions. Any architectural advice is appreciated.\n    submitted by    /u/daviscott7  \n [link]   [comments]",
+          "id": "t3_1qmwhjz",
+          "isoDate": "2026-01-25T21:45:11.000Z"
+        },
+        "pairedItem": {
+          "item": 3
+        }
+      },
+      {
+        "json": {
+          "title": "System Design Hypothetical",
+          "link": "https://old.reddit.com/r/softwarearchitecture/comments/1qmzqa8/system_design_hypothetical/",
+          "pubDate": "2026-01-25T23:49:56.000Z",
+          "author": "/u/Bitter-Cantaloupe206",
+          "content": "<!-- SC_OFF --><div class=\"md\"><p>I&#39;ve been interviewing lately, so naturally I&#39;ve been overthinking every interaction I have with software. This has been on my mind for the past few hours. Scrolling TikTok after a fresh reopen, you notice that after about 5 new videos, you start to get the exact same string of videos you had seen about 10 mins ago. Not just one or two, 10+. I&#39;ve been running through TikTok system design trying to figure out why this would happen, but nada....</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://old.reddit.com/user/Bitter-Cantaloupe206\"> /u/Bitter-Cantaloupe206 </a> <br/> <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qmzqa8/system_design_hypothetical/\">[link]</a></span> &#32; <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qmzqa8/system_design_hypothetical/\">[comments]</a></span>",
+          "contentSnippet": "I've been interviewing lately, so naturally I've been overthinking every interaction I have with software. This has been on my mind for the past few hours. Scrolling TikTok after a fresh reopen, you notice that after about 5 new videos, you start to get the exact same string of videos you had seen about 10 mins ago. Not just one or two, 10+. I've been running through TikTok system design trying to figure out why this would happen, but nada....\n    submitted by    /u/Bitter-Cantaloupe206  \n [link]   [comments]",
+          "id": "t3_1qmzqa8",
+          "isoDate": "2026-01-25T23:49:56.000Z"
+        },
+        "pairedItem": {
+          "item": 4
+        }
+      },
+      {
+        "json": {
+          "title": "Could this tool be useful for your team?",
+          "link": "https://old.reddit.com/r/softwarearchitecture/comments/1qmzk7e/could_this_tool_be_useful_for_your_team/",
+          "pubDate": "2026-01-25T23:42:51.000Z",
+          "author": "/u/MatchLittle5000",
+          "content": "<!-- SC_OFF --><div class=\"md\"><p>Hi, recently I developed a tool for gaining insights (through metrics and historical trends) and defining architectural rules. The idea is to turn architecture into something measurable, reviewable, and enforceable by catching drift early. I don’t want to position it as a testing tool. The focus is more on insights and drift detection.</p> <p>However, I want to understand if it’s really needed. I would be really grateful for any comments or feedback :)</p> <p><a href=\"https://github.com/akhundMurad/pacta\">https://github.com/akhundMurad/pacta</a></p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://old.reddit.com/user/MatchLittle5000\"> /u/MatchLittle5000 </a> <br/> <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qmzk7e/could_this_tool_be_useful_for_your_team/\">[link]</a></span> &#32; <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qmzk7e/could_this_tool_be_useful_for_your_team/\">[comments]</a></span>",
+          "contentSnippet": "Hi, recently I developed a tool for gaining insights (through metrics and historical trends) and defining architectural rules. The idea is to turn architecture into something measurable, reviewable, and enforceable by catching drift early. I don’t want to position it as a testing tool. The focus is more on insights and drift detection.\n However, I want to understand if it’s really needed. I would be really grateful for any comments or feedback :)\n https://github.com/akhundMurad/pacta\n    submitted by    /u/MatchLittle5000  \n [link]   [comments]",
+          "id": "t3_1qmzk7e",
+          "isoDate": "2026-01-25T23:42:51.000Z"
+        },
+        "pairedItem": {
+          "item": 5
+        }
+      },
+      {
+        "json": {
+          "title": "UML Use Case and Class Diagrams Correctness",
+          "link": "https://old.reddit.com/r/softwarearchitecture/comments/1qmnw0a/uml_use_case_and_class_diagrams_correctness/",
+          "pubDate": "2026-01-25T16:34:50.000Z",
+          "author": "/u/Emeralds77",
+          "content": "<!-- SC_OFF --><div class=\"md\"><p>These are Use case and Class diagrams that i created for a software engineering analysis class, so its not about implementing any code for this. The basic idea is to have a safe driving assistance feature in a smart glasses app, that provides checks and feedback after important maneuvers like turns, lane changes etc. and checks for distraction levels by using the eye tracker. Depending on the result a warning or feedback will be issued. I would like to know if the arrows are correct, or if anything is unclear/incorrect.</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://old.reddit.com/user/Emeralds77\"> /u/Emeralds77 </a> <br/> <span><a href=\"https://www.reddit.com/gallery/1qmnw0a\">[link]</a></span> &#32; <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qmnw0a/uml_use_case_and_class_diagrams_correctness/\">[comments]</a></span>",
+          "contentSnippet": "These are Use case and Class diagrams that i created for a software engineering analysis class, so its not about implementing any code for this. The basic idea is to have a safe driving assistance feature in a smart glasses app, that provides checks and feedback after important maneuvers like turns, lane changes etc. and checks for distraction levels by using the eye tracker. Depending on the result a warning or feedback will be issued. I would like to know if the arrows are correct, or if anything is unclear/incorrect.\n    submitted by    /u/Emeralds77  \n [link]   [comments]",
+          "id": "t3_1qmnw0a",
+          "isoDate": "2026-01-25T16:34:50.000Z"
+        },
+        "pairedItem": {
+          "item": 6
+        }
+      },
+      {
+        "json": {
+          "title": "Failing Fast: Why Quick Failures Beat Slow Deaths",
+          "link": "https://old.reddit.com/r/softwarearchitecture/comments/1qmxje3/failing_fast_why_quick_failures_beat_slow_deaths/",
+          "pubDate": "2026-01-25T22:24:06.000Z",
+          "author": "/u/trolleid",
+          "content": "&#32; submitted by &#32; <a href=\"https://old.reddit.com/user/trolleid\"> /u/trolleid </a> <br/> <span><a href=\"https://lukasniessen.medium.com/failing-fast-why-quick-failures-beat-slow-deaths-ffaa491fa510\">[link]</a></span> &#32; <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qmxje3/failing_fast_why_quick_failures_beat_slow_deaths/\">[comments]</a></span>",
+          "contentSnippet": "submitted by    /u/trolleid  \n [link]   [comments]",
+          "id": "t3_1qmxje3",
+          "isoDate": "2026-01-25T22:24:06.000Z"
+        },
+        "pairedItem": {
+          "item": 7
+        }
+      },
+      {
+        "json": {
+          "title": "Avoiding Redis as a single point of failure feedback on this approach?",
+          "link": "https://old.reddit.com/r/softwarearchitecture/comments/1qmceo1/avoiding_redis_as_a_single_point_of_failure/",
+          "pubDate": "2026-01-25T07:16:08.000Z",
+          "author": "/u/saravanasai1412",
+          "content": "<!-- SC_OFF --><div class=\"md\"><p>Hey all, </p> <p>This post is re-phrased version of my last post to discussed but it conveyed different message. so am asking the question different.</p> <p>I been thinking about how to handle Redis failures more gracefully. Redis is great, but when it goes down, a lot of systems just… fall apart . I wanted to avoid that and keep the app usable even if Redis is unavailable.</p> <p>Here’s the rough approach am experimenting with</p> <ul> <li>Redis is treated as a <strong>fast cache</strong>, not something the system fully depends on</li> <li>There’s a <strong>DB-backed cache table</strong> that acts as a fallback</li> <li>All access goes through a small cache manager layer</li> </ul> <p>Flow is pretty simple</p> <ul> <li>When Redis is healthy: <ul> <li>Writes go to DB (for durability) and Redis</li> <li>Reads come from Redis</li> </ul></li> <li>When Redis starts failing: <ul> <li>A <strong>circuit breaker</strong> trips after a few errors</li> <li>Redis calls are skipped entirely</li> <li>Reads/writes fall back to the DB cache</li> </ul></li> <li>To avoid hammering the DB during Redis downtime: <ul> <li>A <strong>token bucket rate limiter</strong> throttles fallback reads</li> </ul></li> <li>Recovery <ul> <li>After a cooldown, allow one Redis probe</li> <li>If it works, switch back to normal</li> <li>Cache warms up naturally over time</li> </ul></li> </ul> <p>Not trying to be fancy here no perfect cache consistency, no sync jobs, just predictable behavior when Redis is down.</p> <p>I am curious:</p> <ul> <li>Does this sound reasonable or over-engineered?</li> <li>Any obvious failure modes I might be missing?</li> <li>How do you usually handle Redis outages in your systems?</li> </ul> <p>Would love to hear other approaches or war stories </p> <p><a href=\"https://preview.redd.it/qnc3xpne4gfg1.png?width=1646&amp;format=png&amp;auto=webp&amp;s=d844d303866502e85d82bc2585f6a575e67d44cd\">https://preview.redd.it/qnc3xpne4gfg1.png?width=1646&amp;format=png&amp;auto=webp&amp;s=d844d303866502e85d82bc2585f6a575e67d44cd</a></p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://old.reddit.com/user/saravanasai1412\"> /u/saravanasai1412 </a> <br/> <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qmceo1/avoiding_redis_as_a_single_point_of_failure/\">[link]</a></span> &#32; <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qmceo1/avoiding_redis_as_a_single_point_of_failure/\">[comments]</a></span>",
+          "contentSnippet": "Hey all, \n This post is re-phrased version of my last post to discussed but it conveyed different message. so am asking the question different.\n I been thinking about how to handle Redis failures more gracefully. Redis is great, but when it goes down, a lot of systems just… fall apart . I wanted to avoid that and keep the app usable even if Redis is unavailable.\n Here’s the rough approach am experimenting with\n  \nRedis is treated as a fast cache, not something the system fully depends on\n There’s a DB-backed cache table that acts as a fallback\n All access goes through a small cache manager layer\n  \nFlow is pretty simple\n  \nWhen Redis is healthy: \n Writes go to DB (for durability) and Redis\n Reads come from Redis\n \n When Redis starts failing: \n A circuit breaker trips after a few errors\n Redis calls are skipped entirely\n Reads/writes fall back to the DB cache\n \n To avoid hammering the DB during Redis downtime: \n A token bucket rate limiter throttles fallback reads\n \n Recovery \n After a cooldown, allow one Redis probe\n If it works, switch back to normal\n Cache warms up naturally over time\n \n  \nNot trying to be fancy here no perfect cache consistency, no sync jobs, just predictable behavior when Redis is down.\n I am curious:\n  \nDoes this sound reasonable or over-engineered?\n Any obvious failure modes I might be missing?\n How do you usually handle Redis outages in your systems?\n  \nWould love to hear other approaches or war stories \n https://preview.redd.it/qnc3xpne4gfg1.png?width=1646&format=png&auto=webp&s=d844d303866502e85d82bc2585f6a575e67d44cd\n    submitted by    /u/saravanasai1412  \n [link]   [comments]",
+          "id": "t3_1qmceo1",
+          "isoDate": "2026-01-25T07:16:08.000Z"
+        },
+        "pairedItem": {
+          "item": 8
+        }
+      },
+      {
+        "json": {
+          "title": "Designing constraint-first generation with LLMs — how to prevent invalid output by design?",
+          "link": "https://old.reddit.com/r/softwarearchitecture/comments/1qmhrwf/designing_constraintfirst_generation_with_llms/",
+          "pubDate": "2026-01-25T12:24:27.000Z",
+          "author": "/u/jouwdroomcoach",
+          "content": "<!-- SC_OFF --><div class=\"md\"><p>I’m working on a system that uses LLMs for generation, but the goal is explicitly not creativity.</p> <p>The goal is: deterministic, error-resistant output where invalid results should be impossible, not corrected afterwards.</p> <p>What I’m trying to avoid: •generate → lint → fix loops •post-hoc validation •probabilistic “good enough” outputs</p> <p>What I’m aiming for instead: •constraint-first generation •explicit decision trees / rule systems •abort-on-violation logic •single-pass generation only if all constraints are satisfied</p> <p>Think closer to: compilers, planners, constrained generators — not prompt engineering.</p> <p>Questions I’m stuck on:</p> <p>-Architectural patterns to enforce hard constraints during generation (not after)</p> <p>-Whether LLMs can realistically be used this way, or if they should only fill predefined slots</p> <p>-How you would define and measure “success” in such systems beyond internal consistency</p> <p>-Where you personally draw the line between engineering guarantees vs accepting probabilistic failure</p> <p>Not looking for tools or prompt tricks. Interested in system-level thinking and failure modes.</p> <p>If you’ve worked on compilers, infra, ML systems, or constrained generation, I’d value your take.</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://old.reddit.com/user/jouwdroomcoach\"> /u/jouwdroomcoach </a> <br/> <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qmhrwf/designing_constraintfirst_generation_with_llms/\">[link]</a></span> &#32; <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qmhrwf/designing_constraintfirst_generation_with_llms/\">[comments]</a></span>",
+          "contentSnippet": "I’m working on a system that uses LLMs for generation, but the goal is explicitly not creativity.\n The goal is: deterministic, error-resistant output where invalid results should be impossible, not corrected afterwards.\n What I’m trying to avoid: •generate → lint → fix loops •post-hoc validation •probabilistic “good enough” outputs\n What I’m aiming for instead: •constraint-first generation •explicit decision trees / rule systems •abort-on-violation logic •single-pass generation only if all constraints are satisfied\n Think closer to: compilers, planners, constrained generators — not prompt engineering.\n Questions I’m stuck on:\n -Architectural patterns to enforce hard constraints during generation (not after)\n -Whether LLMs can realistically be used this way, or if they should only fill predefined slots\n -How you would define and measure “success” in such systems beyond internal consistency\n -Where you personally draw the line between engineering guarantees vs accepting probabilistic failure\n Not looking for tools or prompt tricks. Interested in system-level thinking and failure modes.\n If you’ve worked on compilers, infra, ML systems, or constrained generation, I’d value your take.\n    submitted by    /u/jouwdroomcoach  \n [link]   [comments]",
+          "id": "t3_1qmhrwf",
+          "isoDate": "2026-01-25T12:24:27.000Z"
+        },
+        "pairedItem": {
+          "item": 9
+        }
+      },
+      {
+        "json": {
+          "title": "building a chat-gpt style chat assistant for support team",
+          "link": "https://old.reddit.com/r/softwarearchitecture/comments/1qmpxqp/building_a_chatgpt_style_chat_assistant_for/",
+          "pubDate": "2026-01-25T17:49:04.000Z",
+          "author": "/u/PretendSeason1146",
+          "content": "<!-- SC_OFF --><div class=\"md\"><p>I’m building a ChatGPT-style chatbot for internal/customer support. Users should be able to ask questions in plain language without knowing how the data is stored.</p> <p>Data sources:</p> <pre><code>• Structured data (CSV ticket data) • Unstructured content (PDFs, text docs, wiki pages) </code></pre> <p>Example queries:</p> <p>Structured / analytical:</p> <pre><code>• How many tickets were raised last month? • Top 5 customers by number of tickets • Average resolution time for high-priority issues </code></pre> <p>Unstructured / semantic:</p> <pre><code>• What are common causes of delayed delivery? • Summarize customer onboarding issues • What does the documentation say about refund policies? </code></pre> <p>The system should maintain conversation context, store chat history and feedback, and handle fuzzy or misspelled inputs.</p> <p>Looking for high-level system design approaches and architectural patterns for building something like this.</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://old.reddit.com/user/PretendSeason1146\"> /u/PretendSeason1146 </a> <br/> <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qmpxqp/building_a_chatgpt_style_chat_assistant_for/\">[link]</a></span> &#32; <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qmpxqp/building_a_chatgpt_style_chat_assistant_for/\">[comments]</a></span>",
+          "contentSnippet": "I’m building a ChatGPT-style chatbot for internal/customer support. Users should be able to ask questions in plain language without knowing how the data is stored.\n Data sources:\n • Structured data (CSV ticket data) • Unstructured content (PDFs, text docs, wiki pages) \n Example queries:\n Structured / analytical:\n • How many tickets were raised last month? • Top 5 customers by number of tickets • Average resolution time for high-priority issues \n Unstructured / semantic:\n • What are common causes of delayed delivery? • Summarize customer onboarding issues • What does the documentation say about refund policies? \n The system should maintain conversation context, store chat history and feedback, and handle fuzzy or misspelled inputs.\n Looking for high-level system design approaches and architectural patterns for building something like this.\n    submitted by    /u/PretendSeason1146  \n [link]   [comments]",
+          "id": "t3_1qmpxqp",
+          "isoDate": "2026-01-25T17:49:04.000Z"
+        },
+        "pairedItem": {
+          "item": 10
+        }
+      },
+      {
+        "json": {
+          "title": "What Would You Change in This Tech Stack?",
+          "link": "https://old.reddit.com/r/softwarearchitecture/comments/1qm0alq/what_would_you_change_in_this_tech_stack/",
+          "pubDate": "2026-01-24T21:59:43.000Z",
+          "author": "/u/KodKodKO",
+          "content": "<!-- SC_OFF --><div class=\"md\"><p>Hey everyone,</p> <p>Before we disappear into dev land for the next 6 months, I’d love a sanity check.</p> <p>We’re building an app for some recruiter friends that ran very long-running niche recruiting for specialised industries. The idea is simple: those recruiters need to jungle multi-year recruiting cycles with a pool of 200+ candidates in each role, so based on conversation/ notes emails/responses etc :</p> <p>• extracts key info via LLM (candidate, next steps, follow-up date, etc.)</p> <p>• creates follow-up tasks</p> <p>• optionally generates a Gmail draft</p> <p>• triggers reminders (“follow up in 3 days”)</p> <p>• eventually supports teams (orgs, roles, audit logs, etc.)</p> <p>Basically: AI-powered “don’t forget to follow up” for long-term candidates.</p> <p>⸻</p> <p>Current Stack</p> <p>Frontend</p> <p>• Next.js 14 (App Router)</p> <p>• TypeScript</p> <p>• Tailwind</p> <p>• Deployed on Vercel</p> <p>Backend</p> <p>• Postgres (Vercel Postgres or Supabase)</p> <p>• Prisma</p> <p>• Auth.js / NextAuth (Google OAuth + email login)</p> <p>AI</p> <p>• Claude API (structured outputs → tasks + draft emails)</p> <p>Integrations</p> <p>• Gmail API (OAuth, starting with draft creation only)</p> <p>• LinkedIn (TBD — maybe just store URLs or build a Chrome extension)</p> <p>⸻</p> <p>What we’re trying to avoid</p> <p>We’re two engineers. We don’t want to over-engineer.</p> <p>But we also don’t want to wake up in 6 months and realize:</p> <p>• serverless + Prisma was a mistake</p> <p>• we should’ve separated frontend/backend earlier</p> <p>• Gmail OAuth/token refresh becomes a nightmare</p> <p>• we needed a job queue from day one</p> <p>⸻</p> <p>Be brutally honest and roast my stack if needed, I’d rather pivot now than refactor everything later.</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://old.reddit.com/user/KodKodKO\"> /u/KodKodKO </a> <br/> <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qm0alq/what_would_you_change_in_this_tech_stack/\">[link]</a></span> &#32; <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qm0alq/what_would_you_change_in_this_tech_stack/\">[comments]</a></span>",
+          "contentSnippet": "Hey everyone,\n Before we disappear into dev land for the next 6 months, I’d love a sanity check.\n We’re building an app for some recruiter friends that ran very long-running niche recruiting for specialised industries. The idea is simple: those recruiters need to jungle multi-year recruiting cycles with a pool of 200+ candidates in each role, so based on conversation/ notes emails/responses etc :\n • extracts key info via LLM (candidate, next steps, follow-up date, etc.)\n • creates follow-up tasks\n • optionally generates a Gmail draft\n • triggers reminders (“follow up in 3 days”)\n • eventually supports teams (orgs, roles, audit logs, etc.)\n Basically: AI-powered “don’t forget to follow up” for long-term candidates.\n ⸻\n Current Stack\n Frontend\n • Next.js 14 (App Router)\n • TypeScript\n • Tailwind\n • Deployed on Vercel\n Backend\n • Postgres (Vercel Postgres or Supabase)\n • Prisma\n • Auth.js / NextAuth (Google OAuth + email login)\n AI\n • Claude API (structured outputs → tasks + draft emails)\n Integrations\n • Gmail API (OAuth, starting with draft creation only)\n • LinkedIn (TBD — maybe just store URLs or build a Chrome extension)\n ⸻\n What we’re trying to avoid\n We’re two engineers. We don’t want to over-engineer.\n But we also don’t want to wake up in 6 months and realize:\n • serverless + Prisma was a mistake\n • we should’ve separated frontend/backend earlier\n • Gmail OAuth/token refresh becomes a nightmare\n • we needed a job queue from day one\n ⸻\n Be brutally honest and roast my stack if needed, I’d rather pivot now than refactor everything later.\n    submitted by    /u/KodKodKO  \n [link]   [comments]",
+          "id": "t3_1qm0alq",
+          "isoDate": "2026-01-24T21:59:43.000Z"
+        },
+        "pairedItem": {
+          "item": 11
+        }
+      },
+      {
+        "json": {
+          "title": "Reference Project Layout for Modular Software",
+          "link": "https://old.reddit.com/r/softwarearchitecture/comments/1qlyzrq/reference_project_layout_for_modular_software/",
+          "pubDate": "2026-01-24T21:09:25.000Z",
+          "author": "/u/ewaldbenes",
+          "content": "<!-- SC_OFF --><div class=\"md\"><p>I follow <strong>Domain-Driven Design</strong> and functional programming principles for almost all my projects. I have found that it pays off even for small, one-time scripts. For example, I once wrote a 600-line Python script to transform a LimeSurvey export (<code>*.lsa</code>); by separating the I/O from the logic, the script became much easier to handle.</p> <p><strong>But for every new project, I faced the same problem:</strong></p> <blockquote> <p>Where should I put the files?</p> </blockquote> <p>Thinking about project structure while trying to code adds a mental burden I wanted to avoid. I spent years searching for a &quot;good&quot; structure, but existing boilerplates never quite fit my specific needs. I couldn&#39;t find a layout generic enough to handle every edge case.</p> <p>Therefore, I compiled the lessons from all my projects into this single, unified layout. It scales to fit any dimension or requirement I throw at it.</p> <p>I hope you find it useful.</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://old.reddit.com/user/ewaldbenes\"> /u/ewaldbenes </a> <br/> <span><a href=\"https://gist.github.com/ewaldbenes/a7879a187cedb47ed9744ad2929e5d79\">[link]</a></span> &#32; <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qlyzrq/reference_project_layout_for_modular_software/\">[comments]</a></span>",
+          "contentSnippet": "I follow Domain-Driven Design and functional programming principles for almost all my projects. I have found that it pays off even for small, one-time scripts. For example, I once wrote a 600-line Python script to transform a LimeSurvey export (*.lsa); by separating the I/O from the logic, the script became much easier to handle.\n But for every new project, I faced the same problem:\n  \nWhere should I put the files?\n  \nThinking about project structure while trying to code adds a mental burden I wanted to avoid. I spent years searching for a \"good\" structure, but existing boilerplates never quite fit my specific needs. I couldn't find a layout generic enough to handle every edge case.\n Therefore, I compiled the lessons from all my projects into this single, unified layout. It scales to fit any dimension or requirement I throw at it.\n I hope you find it useful.\n    submitted by    /u/ewaldbenes  \n [link]   [comments]",
+          "id": "t3_1qlyzrq",
+          "isoDate": "2026-01-24T21:09:25.000Z"
+        },
+        "pairedItem": {
+          "item": 12
+        }
+      },
+      {
+        "json": {
+          "title": "DoorDash Applies AI to Safety Across Chat and Calls, Cutting Incidents by 50%",
+          "link": "https://old.reddit.com/r/softwarearchitecture/comments/1qlr6i1/doordash_applies_ai_to_safety_across_chat_and/",
+          "pubDate": "2026-01-24T16:18:56.000Z",
+          "author": "/u/rgancarz",
+          "content": "&#32; submitted by &#32; <a href=\"https://old.reddit.com/user/rgancarz\"> /u/rgancarz </a> <br/> <span><a href=\"https://www.infoq.com/news/2026/01/doordash-safechat-ai-safety/\">[link]</a></span> &#32; <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qlr6i1/doordash_applies_ai_to_safety_across_chat_and/\">[comments]</a></span>",
+          "contentSnippet": "submitted by    /u/rgancarz  \n [link]   [comments]",
+          "id": "t3_1qlr6i1",
+          "isoDate": "2026-01-24T16:18:56.000Z"
+        },
+        "pairedItem": {
+          "item": 13
+        }
+      },
+      {
+        "json": {
+          "title": "OpenAI’s PostgreSQL scaling: impressive engineering, but very workload-specific",
+          "link": "https://old.reddit.com/r/softwarearchitecture/comments/1qlb3ow/openais_postgresql_scaling_impressive_engineering/",
+          "pubDate": "2026-01-24T02:46:32.000Z",
+          "author": "/u/mddubey",
+          "content": "<!-- SC_OFF --><div class=\"md\"><p>I am a read only user of reddit, but OpenAI’s recent blog on scaling PostgreSQL finally pushed me to write. The engineering work is genuinely impressive — especially how far they pushed a single-primary Postgres setup using read replicas, caching, and careful workload isolation.</p> <p>That said, I feel some of the public takeaways are being over-generalized. I’ve seen people jump to the conclusion that distributed databases are “over-engineering” or even a “false need.” While I agree that many teams start with complex DB clustering far too early, it isn’t fair — or accurate — to dismiss distributed systems altogether.</p> <p>IMO, most user-facing OpenAI product flows can tolerate eventual consistency. I can’t think of a day-to-day feature that truly requires strict read-after-write semantics from a primary RDBMS. Login/signup, token validation, rate limits, chat history, recent conversations, usage dashboards, and even billing metadata are overwhelmingly read-heavy and cache-friendly, with only a few infrequent edge cases (e.g., security revocations or hard rate-limit enforcement) requiring tighter consistency that don’t sit on common user paths.</p> <p>The blog also acknowledges using <strong>Cosmos DB for write-heavy workloads</strong>, which is a sharded, distributed database. So this isn’t really a case of scaling to hundreds of millions of users purely on Postgres. A more accurate takeaway is that <strong>Postgres was scaled extremely well for read-heavy workloads,</strong> while high-write paths were pushed elsewhere.</p> <p>This setup works well for OpenAI because writes are minimal, transactional requirements are low, and read scaling is handled via replicas and caches. It wouldn’t directly translate to domains like <strong>fintech, e-commerce, or logistics</strong> with high write contention or strong consistency needs. The key takeaway isn’t that distributed databases are obsolete — it’s that minimizing synchronous writes can dramatically simplify scaling, when your workload allows it.</p> <p>Read the blog here: <a href=\"https://openai.com/index/scaling-postgresql/\">https://openai.com/index/scaling-postgresql/</a></p> <p><strong>PS:</strong> I may have used ChatGPT to discuss &amp; polish my thoughts. Yes, the irony is noted.</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://old.reddit.com/user/mddubey\"> /u/mddubey </a> <br/> <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qlb3ow/openais_postgresql_scaling_impressive_engineering/\">[link]</a></span> &#32; <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qlb3ow/openais_postgresql_scaling_impressive_engineering/\">[comments]</a></span>",
+          "contentSnippet": "I am a read only user of reddit, but OpenAI’s recent blog on scaling PostgreSQL finally pushed me to write. The engineering work is genuinely impressive — especially how far they pushed a single-primary Postgres setup using read replicas, caching, and careful workload isolation.\n That said, I feel some of the public takeaways are being over-generalized. I’ve seen people jump to the conclusion that distributed databases are “over-engineering” or even a “false need.” While I agree that many teams start with complex DB clustering far too early, it isn’t fair — or accurate — to dismiss distributed systems altogether.\n IMO, most user-facing OpenAI product flows can tolerate eventual consistency. I can’t think of a day-to-day feature that truly requires strict read-after-write semantics from a primary RDBMS. Login/signup, token validation, rate limits, chat history, recent conversations, usage dashboards, and even billing metadata are overwhelmingly read-heavy and cache-friendly, with only a few infrequent edge cases (e.g., security revocations or hard rate-limit enforcement) requiring tighter consistency that don’t sit on common user paths.\n The blog also acknowledges using Cosmos DB for write-heavy workloads, which is a sharded, distributed database. So this isn’t really a case of scaling to hundreds of millions of users purely on Postgres. A more accurate takeaway is that Postgres was scaled extremely well for read-heavy workloads, while high-write paths were pushed elsewhere.\n This setup works well for OpenAI because writes are minimal, transactional requirements are low, and read scaling is handled via replicas and caches. It wouldn’t directly translate to domains like fintech, e-commerce, or logistics with high write contention or strong consistency needs. The key takeaway isn’t that distributed databases are obsolete — it’s that minimizing synchronous writes can dramatically simplify scaling, when your workload allows it.\n Read the blog here: https://openai.com/index/scaling-postgresql/\n PS: I may have used ChatGPT to discuss & polish my thoughts. Yes, the irony is noted.\n    submitted by    /u/mddubey  \n [link]   [comments]",
+          "id": "t3_1qlb3ow",
+          "isoDate": "2026-01-24T02:46:32.000Z"
+        },
+        "pairedItem": {
+          "item": 14
+        }
+      },
+      {
+        "json": {
+          "title": "Help Coordinating Workers Workload Selection",
+          "link": "https://old.reddit.com/r/softwarearchitecture/comments/1qlms2f/help_coordinating_workers_workload_selection/",
+          "pubDate": "2026-01-24T13:19:10.000Z",
+          "author": "/u/Longjumping-Piece838",
+          "content": "<!-- SC_OFF --><div class=\"md\"><p>Hi everyone!</p> <p>Last week, after reading few posts, I started thinking about how could I design a Recurring Notification service.</p> <p>The first thing that came to mind was define a <strong>Notification Table</strong>:</p> <pre><code>table Notification: user_id week_day message_body </code></pre> <p>To make thing simpler on this post we will limit the recurring to just week days (Monday == 0 and Sunday == 6) and the delivery always happens at 13:00 UTC.</p> <p>We would also need a Compute Worker to read the database and find out which <strong>Notification</strong> has to be delivered.</p> <pre><code>SELECT * FROM Notification AS u WHERE u.week_day = curr_week_day +----------+ +----+ | Worker 1 |--READ--&gt;| DB | +----------+ +----+ </code></pre> <p>From there we can apply/verify all sort of Business Rules.</p> <p>This is works fine in the scenario where we only have a single worker and a small set of <strong>Notification</strong>s registered.</p> <p>Once we move to a real world scenario we would need to scale the number of worker to not miss the mark on dispatching the notifications.</p> <p><em>(That&#39;s where I started doubting myself)</em></p> <p>Even though we need to increase the amount of Workers this will lead us to duplicated work:</p> <p>- The base query will be executed by 2 Compute Units</p> <p>- The 2 Compute Unit will select the exact same list</p> <p>- The 2 Compute Unit will dispatch the Notification</p> <p>One way avoid duplication is to migrate/move the &quot;dispatch email&quot; part of the Compute Unit to a separated Unit.</p> <p>Maybe adding a sort of Queue-like Storage with the capability of denying duplicated messages.</p> <pre><code> +--READ--&gt;|Queue|&lt;--WRITE--+ | | +--------------+ +----------+ +----+ |Email Worker 1| | Worker 1 |--READ--&gt;| DB | +--------------+ +----------+ +----+ | | | +----------+ | | | Worker 2 |--READ------+ | +----------+ | | +--READ--&gt;|Queue|&lt;--WRITE--+ </code></pre> <p>Even though we can prevent delivery the same Notification twice this will still let our &quot;core&quot; Compute Units wasting time processing Notifications twice.</p> <p><em>(here it comes...)</em></p> <p>So to try avoid wasting computing time (money) I was started to think about <strong>Paginating</strong> the <strong>Database Query</strong> based on one of the two strategies:</p> <p>- Page Size = Amount of Notifications we can process in a Single Second</p> <p>- Page Size = Count(Notifications) / Count(Business Workers)</p> <p>But that leaves the question: How exactly do we make sure the Business Workers do not ready the same page (offset)?</p> <p><strong>So far</strong> the only practical solution was to create another Compute Unit to Coordinate the distribution of Offset Numbers: (Offset Coordinator).</p> <p>The Idea here is:</p> <p>- Coordinator (somehow) will calculated how many offsets we have: 1, 2, 3, 4...</p> <p>- As soon as a Compute Business Worker boot it will ASK the Coordinator for an Offset (Page) Number. That Offset (Page) Number won&#39;t be redistributed to another instance.</p> <p>- Coordinator will (somehow - still thinking on this one) check if that particular instance is still alive. If NOT it will &quot;release&quot; the Offset Number and make it available to another instance to pick up.</p> <p><strong>Question Is:</strong></p> <p>Does the Coordinator strategy sounds reasonable OR am I over-complicating things here? </p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://old.reddit.com/user/Longjumping-Piece838\"> /u/Longjumping-Piece838 </a> <br/> <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qlms2f/help_coordinating_workers_workload_selection/\">[link]</a></span> &#32; <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qlms2f/help_coordinating_workers_workload_selection/\">[comments]</a></span>",
+          "contentSnippet": "Hi everyone!\n Last week, after reading few posts, I started thinking about how could I design a Recurring Notification service.\n The first thing that came to mind was define a Notification Table:\n table Notification: user_id week_day message_body \n To make thing simpler on this post we will limit the recurring to just week days (Monday == 0 and Sunday == 6) and the delivery always happens at 13:00 UTC.\n We would also need a Compute Worker to read the database and find out which Notification has to be delivered.\n SELECT * FROM Notification AS u WHERE u.week_day = curr_week_day +----------+ +----+ | Worker 1 |--READ-->| DB | +----------+ +----+ \n From there we can apply/verify all sort of Business Rules.\n This is works fine in the scenario where we only have a single worker and a small set of Notifications registered.\n Once we move to a real world scenario we would need to scale the number of worker to not miss the mark on dispatching the notifications.\n (That's where I started doubting myself)\n Even though we need to increase the amount of Workers this will lead us to duplicated work:\n - The base query will be executed by 2 Compute Units\n - The 2 Compute Unit will select the exact same list\n - The 2 Compute Unit will dispatch the Notification\n One way avoid duplication is to migrate/move the \"dispatch email\" part of the Compute Unit to a separated Unit.\n Maybe adding a sort of Queue-like Storage with the capability of denying duplicated messages.\n  +--READ-->|Queue|<--WRITE--+ | | +--------------+ +----------+ +----+ |Email Worker 1| | Worker 1 |--READ-->| DB | +--------------+ +----------+ +----+ | | | +----------+ | | | Worker 2 |--READ------+ | +----------+ | | +--READ-->|Queue|<--WRITE--+ \n Even though we can prevent delivery the same Notification twice this will still let our \"core\" Compute Units wasting time processing Notifications twice.\n (here it comes...)\n So to try avoid wasting computing time (money) I was started to think about Paginating the Database Query based on one of the two strategies:\n - Page Size = Amount of Notifications we can process in a Single Second\n - Page Size = Count(Notifications) / Count(Business Workers)\n But that leaves the question: How exactly do we make sure the Business Workers do not ready the same page (offset)?\n So far the only practical solution was to create another Compute Unit to Coordinate the distribution of Offset Numbers: (Offset Coordinator).\n The Idea here is:\n - Coordinator (somehow) will calculated how many offsets we have: 1, 2, 3, 4...\n - As soon as a Compute Business Worker boot it will ASK the Coordinator for an Offset (Page) Number. That Offset (Page) Number won't be redistributed to another instance.\n - Coordinator will (somehow - still thinking on this one) check if that particular instance is still alive. If NOT it will \"release\" the Offset Number and make it available to another instance to pick up.\n Question Is:\n Does the Coordinator strategy sounds reasonable OR am I over-complicating things here? \n    submitted by    /u/Longjumping-Piece838  \n [link]   [comments]",
+          "id": "t3_1qlms2f",
+          "isoDate": "2026-01-24T13:19:10.000Z"
+        },
+        "pairedItem": {
+          "item": 15
+        }
+      },
+      {
+        "json": {
+          "title": "Is it bad to use an array as a method of keeping track of menu state?",
+          "link": "https://old.reddit.com/r/softwarearchitecture/comments/1qlbvj7/is_it_bad_to_use_an_array_as_a_method_of_keeping/",
+          "pubDate": "2026-01-24T03:21:58.000Z",
+          "author": "/u/post_hazanko",
+          "content": "<!-- SC_OFF --><div class=\"md\"><p>So imagine you have a tree of a menu system:</p> <ul> <li>- home <ul> <li>settings <ul> <li>option 1</li> <li>option 2</li> </ul></li> <li>files <ul> <li>a file</li> </ul></li> </ul></li> </ul> <p>You could imagine a menu state being: [0, 1] meaning home is 0 and settings <del>option 1</del> (should be option 2)</p> <p>Does that seem bad or does it make sense?</p> <p>This state is not really read by people, it&#39;s just keeping track of depth through a nested folder system</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://old.reddit.com/user/post_hazanko\"> /u/post_hazanko </a> <br/> <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qlbvj7/is_it_bad_to_use_an_array_as_a_method_of_keeping/\">[link]</a></span> &#32; <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qlbvj7/is_it_bad_to_use_an_array_as_a_method_of_keeping/\">[comments]</a></span>",
+          "contentSnippet": "So imagine you have a tree of a menu system:\n  \n- home \n settings \n option 1\n option 2\n \n files \n a file\n \n \n  \nYou could imagine a menu state being: [0, 1] meaning home is 0 and settings option 1 (should be option 2)\n Does that seem bad or does it make sense?\n This state is not really read by people, it's just keeping track of depth through a nested folder system\n    submitted by    /u/post_hazanko  \n [link]   [comments]",
+          "id": "t3_1qlbvj7",
+          "isoDate": "2026-01-24T03:21:58.000Z"
+        },
+        "pairedItem": {
+          "item": 16
+        }
+      },
+      {
+        "json": {
+          "title": "Designing a Redis-resilient cache for fintech flows looking for feedback & pitfalls",
+          "link": "https://old.reddit.com/r/softwarearchitecture/comments/1qkw6og/designing_a_redisresilient_cache_for_fintech/",
+          "pubDate": "2026-01-23T16:56:19.000Z",
+          "author": "/u/saravanasai1412",
+          "content": "<!-- SC_OFF --><div class=\"md\"><p>Hey all,</p> <p>Im working on a backend system in a fintech context where <strong>correctness matters more than raw performance</strong>, and I love some community feedback on an approach am considering.</p> <p>The main goal is simple</p> <p>Redis is great, but I don’t want it to be a <strong>single point of failure</strong>.</p> <p>High-level idea</p> <ul> <li>Redis is treated as a <strong>performance accelerator</strong>, not a source of truth</li> <li>PostgreSQL acts as a <strong>durable fallback</strong></li> </ul> <p>How the flow works</p> <p><strong>Normal path (Redis healthy):</strong></p> <ul> <li>Writes go to DB (durable)</li> <li>Writes also go to Redis (fast path)</li> <li>Reads come from Redis</li> </ul> <p><strong>If Redis starts failing:</strong></p> <ul> <li>A <strong>circuit breaker</strong> trips after a few failures</li> <li>Redis is temporarily isolated</li> <li>All reads/writes fall back to a DB-backed cache table</li> </ul> <p><strong>To protect the DB during Redis outages:</strong></p> <ul> <li>A <strong>token bucket rate limiter</strong> throttles fallback DB reads &amp; writes</li> <li>Goal is controlled degradation, not max throughput</li> </ul> <p><strong>Recovery</strong></p> <ul> <li>After a cooldown, the circuit breaker allows a single probe</li> <li>If Redis responds, normal operation resumes</li> </ul> <p><strong>Design choices I’m unsure about</strong></p> <p>I’m intentionally keeping this simple, but I’d love feedback on</p> <ul> <li>Using a <strong>DB-backed cache table</strong> as a Redis fallback - good idea or hidden foot-gun?</li> <li>Circuit breaker + rate limiter in the app layer - overkill or reasonable?</li> <li>Token bucket for DB protection - would you do something else?</li> <li>Any failure modes I might be missing?</li> <li>Alternative patterns you’ve seen work better in production?</li> </ul> <p>update flow image for better understanding </p> <p><a href=\"https://preview.redd.it/zt3qiirw48fg1.png?width=1646&amp;format=png&amp;auto=webp&amp;s=e40813fcb14802ffe71b5bfe1611601577190c9b\">https://preview.redd.it/zt3qiirw48fg1.png?width=1646&amp;format=png&amp;auto=webp&amp;s=e40813fcb14802ffe71b5bfe1611601577190c9b</a></p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://old.reddit.com/user/saravanasai1412\"> /u/saravanasai1412 </a> <br/> <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qkw6og/designing_a_redisresilient_cache_for_fintech/\">[link]</a></span> &#32; <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qkw6og/designing_a_redisresilient_cache_for_fintech/\">[comments]</a></span>",
+          "contentSnippet": "Hey all,\n Im working on a backend system in a fintech context where correctness matters more than raw performance, and I love some community feedback on an approach am considering.\n The main goal is simple\n Redis is great, but I don’t want it to be a single point of failure.\n High-level idea\n  \nRedis is treated as a performance accelerator, not a source of truth\n PostgreSQL acts as a durable fallback\n  \nHow the flow works\n Normal path (Redis healthy):\n  \nWrites go to DB (durable)\n Writes also go to Redis (fast path)\n Reads come from Redis\n  \nIf Redis starts failing:\n  \nA circuit breaker trips after a few failures\n Redis is temporarily isolated\n All reads/writes fall back to a DB-backed cache table\n  \nTo protect the DB during Redis outages:\n  \nA token bucket rate limiter throttles fallback DB reads & writes\n Goal is controlled degradation, not max throughput\n  \nRecovery\n  \nAfter a cooldown, the circuit breaker allows a single probe\n If Redis responds, normal operation resumes\n  \nDesign choices I’m unsure about\n I’m intentionally keeping this simple, but I’d love feedback on\n  \nUsing a DB-backed cache table as a Redis fallback - good idea or hidden foot-gun?\n Circuit breaker + rate limiter in the app layer - overkill or reasonable?\n Token bucket for DB protection - would you do something else?\n Any failure modes I might be missing?\n Alternative patterns you’ve seen work better in production?\n  \nupdate flow image for better understanding \n https://preview.redd.it/zt3qiirw48fg1.png?width=1646&format=png&auto=webp&s=e40813fcb14802ffe71b5bfe1611601577190c9b\n    submitted by    /u/saravanasai1412  \n [link]   [comments]",
+          "id": "t3_1qkw6og",
+          "isoDate": "2026-01-23T16:56:19.000Z"
+        },
+        "pairedItem": {
+          "item": 17
+        }
+      },
+      {
+        "json": {
+          "title": "Handling likes at scale",
+          "link": "https://old.reddit.com/r/softwarearchitecture/comments/1qkuj5r/handling_likes_at_scale/",
+          "pubDate": "2026-01-23T15:55:44.000Z",
+          "author": "/u/rkaw92",
+          "content": "<!-- SC_OFF --><div class=\"md\"><p>Hi, I&#39;m tackling a theoretical problem that can soon become very practical. Given a website for sharing videos, assume a new video gets uploaded and gains immediate popularity. Millions of users (each with their own account) start &quot;liking&quot; it. As you can imagine, the goal is to handle them all so that:</p> <p>* Each user gets immediate feedback that their like has been registered (whether its impact on the total is immediate or delayed is another thing)</p> <p>* You can revoke your like at any time</p> <p>* Likes are not duplicated - you cannot impart more than 1 like on any given video, even if you click like-unlike a thousand times in rapid succession</p> <p>* The total number of likes is convergent to the number of the users who actually expressed a like, not drifting randomly like Facebook or Reddit comment counts (&quot;bro got downcommented&quot; ☠️)</p> <p>* The solution should be cheap and effective, not consume 90% of a project&#39;s budget</p> <p>* Absolute durability is not a mandatory goal, but convergence is (say, 10 seconds of likes lost is OK, as long as there is no permanent inconsistency where those likes show up to some people only, or the like-giver thinks their vote is counted where really it is not)</p> <p>Previously, I&#39;ve read tens of articles of varying quality on Medium and similar places. The top concepts that seem to emerge are:</p> <p>* Queueing / streaming by offloading to Kafka (of course - good for absorbing burst traffic, less good for sustained hits)</p> <p>* Relaxing consistency requirements (don&#39;t check duplicates at write time, deduplicate in the background - counter increment/decrement not transactional)</p> <p>* Sharded counters (cut up hot partitions into shards, reconstruct at read time)</p> <p>My problem is, I&#39;m not thrilled by these proposed solutions. Especially the middle one sounds more like CV padding material than actual code I&#39;d like to see running in production. Having a stochastic anti-entropy layer that recomputes the like count for a sample of my videos all the time? No thank you, I&#39;m not trying to reimplement ScyllaDB. Surely there must be a sane way to go about this.</p> <p>So now I&#39;m back to basics. From trying to conceptualize the problem space, I got this:</p> <p>* For every user, there exists a set of the videos they have liked</p> <p>* For every video, there exists a set of the users who have liked it</p> <p>* These sets are not correlated in any way: any user can like any video, so no common sharding key can be found (not good!)</p> <p>* Therefore, the challenge lies in the transformation from a dataset that&#39;s trivially shardable by userID to another, which is shardable by videoID (but suffers from hot items)</p> <p>If we naively shard the user/like pairs by user ID, we can potentially get strong consistency when doing like generation. So, for any single user, we could maintain a strongly-consistent and exhaustive set of &quot;you have liked these videos&quot;. Assuming that no user likes a billion videos (we can enforce this!), really hot or heavy shards should not come up. It is very unlikely that very active users would get co-located inside such a &quot;like-producing&quot; shard.</p> <p>But then, reads spell real trouble. In order to definitely determine the total likes for any video, you have to contact *all* user shards and ask them &quot;how many likes for this particular vid?&quot;. It doesn&#39;t scale: the more user shards, the more parallel reads. That is a sure-fire sign our service is going to get slower, not faster.</p> <p>If we shard by the userID/videoID pair, instead? This helps, but only if we apply a 2-level sharding algorithm: for each video, nominate a subset of shards (servers) of size N. Then, based on userID, pick from among those nominated ones. Then, we still have hot items, but their load is spread over several physical shards. Retrieving the like count for any individial video requires exactly N underlying queries. On the other hand, if a video is sufficiently popular, the wild firehose of inbound likes can still overflow the processing capacity of N shards, since there is no facility to spread the load further if a static N turns out to be not enough.</p> <p>Now, so far this is the best I could come up with. When it comes to the value of N (each video&#39;s likes spread over *this many* servers), we could find its optimal value. From a backing database&#39;s point of view, there probably exists some optimum R:W ratio that depends on whether it uses a WAL, if it has B-Tree indices, etc...</p> <p>But let&#39;s look at it from a different angle. A popular video site will surely have a read-side caching layer. We can safely assume the cache is not dumb as a rock, and will do request coalescing (so that a cache miss doesn&#39;t result in 100,000 RPS for this video - only one request, or globally as many requests as there are physical cache instances running).</p> <p>Now, the optimum N looks differently: instead of wondering &quot;how many read requests times N per second will I get on a popular video&quot;, the question becomes: how long exactly is my long tail of unpopular videos? What minimum cache hit rate do I have to maintain to offset the N multiplier for reads?</p> <p>So, for now these are my thoughts. Sorry if they&#39;re a bit all over the place.</p> <p>All in all, I&#39;m wondering: is there anything else to improve? Would you design a &quot;Like&quot; system for the Web differently? Or maybe the &quot;write now, verify later&quot; technique has a simple trick I&#39;m not aware of to make it worth it?</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://old.reddit.com/user/rkaw92\"> /u/rkaw92 </a> <br/> <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qkuj5r/handling_likes_at_scale/\">[link]</a></span> &#32; <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qkuj5r/handling_likes_at_scale/\">[comments]</a></span>",
+          "contentSnippet": "Hi, I'm tackling a theoretical problem that can soon become very practical. Given a website for sharing videos, assume a new video gets uploaded and gains immediate popularity. Millions of users (each with their own account) start \"liking\" it. As you can imagine, the goal is to handle them all so that:\n * Each user gets immediate feedback that their like has been registered (whether its impact on the total is immediate or delayed is another thing)\n * You can revoke your like at any time\n * Likes are not duplicated - you cannot impart more than 1 like on any given video, even if you click like-unlike a thousand times in rapid succession\n * The total number of likes is convergent to the number of the users who actually expressed a like, not drifting randomly like Facebook or Reddit comment counts (\"bro got downcommented\" ☠️)\n * The solution should be cheap and effective, not consume 90% of a project's budget\n * Absolute durability is not a mandatory goal, but convergence is (say, 10 seconds of likes lost is OK, as long as there is no permanent inconsistency where those likes show up to some people only, or the like-giver thinks their vote is counted where really it is not)\n Previously, I've read tens of articles of varying quality on Medium and similar places. The top concepts that seem to emerge are:\n * Queueing / streaming by offloading to Kafka (of course - good for absorbing burst traffic, less good for sustained hits)\n * Relaxing consistency requirements (don't check duplicates at write time, deduplicate in the background - counter increment/decrement not transactional)\n * Sharded counters (cut up hot partitions into shards, reconstruct at read time)\n My problem is, I'm not thrilled by these proposed solutions. Especially the middle one sounds more like CV padding material than actual code I'd like to see running in production. Having a stochastic anti-entropy layer that recomputes the like count for a sample of my videos all the time? No thank you, I'm not trying to reimplement ScyllaDB. Surely there must be a sane way to go about this.\n So now I'm back to basics. From trying to conceptualize the problem space, I got this:\n * For every user, there exists a set of the videos they have liked\n * For every video, there exists a set of the users who have liked it\n * These sets are not correlated in any way: any user can like any video, so no common sharding key can be found (not good!)\n * Therefore, the challenge lies in the transformation from a dataset that's trivially shardable by userID to another, which is shardable by videoID (but suffers from hot items)\n If we naively shard the user/like pairs by user ID, we can potentially get strong consistency when doing like generation. So, for any single user, we could maintain a strongly-consistent and exhaustive set of \"you have liked these videos\". Assuming that no user likes a billion videos (we can enforce this!), really hot or heavy shards should not come up. It is very unlikely that very active users would get co-located inside such a \"like-producing\" shard.\n But then, reads spell real trouble. In order to definitely determine the total likes for any video, you have to contact *all* user shards and ask them \"how many likes for this particular vid?\". It doesn't scale: the more user shards, the more parallel reads. That is a sure-fire sign our service is going to get slower, not faster.\n If we shard by the userID/videoID pair, instead? This helps, but only if we apply a 2-level sharding algorithm: for each video, nominate a subset of shards (servers) of size N. Then, based on userID, pick from among those nominated ones. Then, we still have hot items, but their load is spread over several physical shards. Retrieving the like count for any individial video requires exactly N underlying queries. On the other hand, if a video is sufficiently popular, the wild firehose of inbound likes can still overflow the processing capacity of N shards, since there is no facility to spread the load further if a static N turns out to be not enough.\n Now, so far this is the best I could come up with. When it comes to the value of N (each video's likes spread over *this many* servers), we could find its optimal value. From a backing database's point of view, there probably exists some optimum R:W ratio that depends on whether it uses a WAL, if it has B-Tree indices, etc...\n But let's look at it from a different angle. A popular video site will surely have a read-side caching layer. We can safely assume the cache is not dumb as a rock, and will do request coalescing (so that a cache miss doesn't result in 100,000 RPS for this video - only one request, or globally as many requests as there are physical cache instances running).\n Now, the optimum N looks differently: instead of wondering \"how many read requests times N per second will I get on a popular video\", the question becomes: how long exactly is my long tail of unpopular videos? What minimum cache hit rate do I have to maintain to offset the N multiplier for reads?\n So, for now these are my thoughts. Sorry if they're a bit all over the place.\n All in all, I'm wondering: is there anything else to improve? Would you design a \"Like\" system for the Web differently? Or maybe the \"write now, verify later\" technique has a simple trick I'm not aware of to make it worth it?\n    submitted by    /u/rkaw92  \n [link]   [comments]",
+          "id": "t3_1qkuj5r",
+          "isoDate": "2026-01-23T15:55:44.000Z"
+        },
+        "pairedItem": {
+          "item": 18
+        }
+      },
+      {
+        "json": {
+          "title": "Architecture for a Mobile Game with 3D Assets",
+          "link": "https://old.reddit.com/r/softwarearchitecture/comments/1qkyoo8/architecture_for_a_mobile_game_with_3d_assets/",
+          "pubDate": "2026-01-23T18:26:31.000Z",
+          "author": "/u/Long_Drink1680",
+          "content": "<!-- SC_OFF --><div class=\"md\"><p>Hello, I am a newbie developer who got roped into developing a 3D mobile game. The plan is to have a Node.js backend and React Native frontend with Babylon.js for 3D rendering. Since this will go to production, I would like to know how the architectures of these kind of games are usually designed. If there is anyone with previous experience developing something like this, insights are appreciated. In addition, what are the architectural decisions you need to make sure that this kind of set up with 3D assets perform well even on low-end devices?</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://old.reddit.com/user/Long_Drink1680\"> /u/Long_Drink1680 </a> <br/> <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qkyoo8/architecture_for_a_mobile_game_with_3d_assets/\">[link]</a></span> &#32; <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qkyoo8/architecture_for_a_mobile_game_with_3d_assets/\">[comments]</a></span>",
+          "contentSnippet": "Hello, I am a newbie developer who got roped into developing a 3D mobile game. The plan is to have a Node.js backend and React Native frontend with Babylon.js for 3D rendering. Since this will go to production, I would like to know how the architectures of these kind of games are usually designed. If there is anyone with previous experience developing something like this, insights are appreciated. In addition, what are the architectural decisions you need to make sure that this kind of set up with 3D assets perform well even on low-end devices?\n    submitted by    /u/Long_Drink1680  \n [link]   [comments]",
+          "id": "t3_1qkyoo8",
+          "isoDate": "2026-01-23T18:26:31.000Z"
+        },
+        "pairedItem": {
+          "item": 19
+        }
+      },
+      {
+        "json": {
+          "title": "Fixing Systems That ‘Work’ But Misbehave",
+          "link": "https://old.reddit.com/r/softwarearchitecture/comments/1qkqemq/fixing_systems_that_work_but_misbehave/",
+          "pubDate": "2026-01-23T13:10:58.000Z",
+          "author": "/u/Suspicious-Case1667",
+          "content": "<!-- SC_OFF --><div class=\"md\"><p>ok so hear me out. most failures don’t come from bad code. they don’t come from the wrong pattern. they come from humans. from teams. from everyone doing the “right thing” but no one owning the whole thing.</p> <p>like one team is all about performance. another is about maintainability. another about compliance. another about user experience. every tradeoff is fine. makes sense. defensible even. but somehow the system slowly drifts away from what it was meant to do.</p> <p>nothing crashes. metrics look fine. everything “works”. but when you step back the outcome is… off. and no one knows exactly where. the hardest problems aren’t the bugs. they’re the spaces between teams, between services, between ownership. that’s where drift lives.</p> <p>logs, frontends, APIs, even weird edge cases? they all tell you the truth. they show what the system actually allows, not what the documents say it’s supposed to do.</p> <p>fix one module, change one service but if the alignment is off, nothing fixes itself.</p> <p>so here’s the real question: if everyone did their job right, who owns the outcome? who is responsible when the system “works” but still fails? think about that.</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://old.reddit.com/user/Suspicious-Case1667\"> /u/Suspicious-Case1667 </a> <br/> <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qkqemq/fixing_systems_that_work_but_misbehave/\">[link]</a></span> &#32; <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qkqemq/fixing_systems_that_work_but_misbehave/\">[comments]</a></span>",
+          "contentSnippet": "ok so hear me out. most failures don’t come from bad code. they don’t come from the wrong pattern. they come from humans. from teams. from everyone doing the “right thing” but no one owning the whole thing.\n like one team is all about performance. another is about maintainability. another about compliance. another about user experience. every tradeoff is fine. makes sense. defensible even. but somehow the system slowly drifts away from what it was meant to do.\n nothing crashes. metrics look fine. everything “works”. but when you step back the outcome is… off. and no one knows exactly where. the hardest problems aren’t the bugs. they’re the spaces between teams, between services, between ownership. that’s where drift lives.\n logs, frontends, APIs, even weird edge cases? they all tell you the truth. they show what the system actually allows, not what the documents say it’s supposed to do.\n fix one module, change one service but if the alignment is off, nothing fixes itself.\n so here’s the real question: if everyone did their job right, who owns the outcome? who is responsible when the system “works” but still fails? think about that.\n    submitted by    /u/Suspicious-Case1667  \n [link]   [comments]",
+          "id": "t3_1qkqemq",
+          "isoDate": "2026-01-23T13:10:58.000Z"
+        },
+        "pairedItem": {
+          "item": 20
+        }
+      },
+      {
+        "json": {
+          "title": "Optimistic locking can save your ledger from SELECT FOR UPDATE hell",
+          "link": "https://old.reddit.com/r/softwarearchitecture/comments/1ql1r7d/optimistic_locking_can_save_your_ledger_from/",
+          "pubDate": "2026-01-23T20:19:26.000Z",
+          "author": "/u/martinffx",
+          "content": "&#32; submitted by &#32; <a href=\"https://old.reddit.com/user/martinffx\"> /u/martinffx </a> <br/> <span><a href=\"/r/ExperiencedDevs/comments/1ql1q1g/optimistic_locking_can_save_your_ledger_from/\">[link]</a></span> &#32; <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1ql1r7d/optimistic_locking_can_save_your_ledger_from/\">[comments]</a></span>",
+          "contentSnippet": "submitted by    /u/martinffx  \n [link]   [comments]",
+          "id": "t3_1ql1r7d",
+          "isoDate": "2026-01-23T20:19:26.000Z"
+        },
+        "pairedItem": {
+          "item": 21
+        }
+      },
+      {
+        "json": {
+          "title": "need guidance on microservice architecture",
+          "link": "https://old.reddit.com/r/softwarearchitecture/comments/1qkm7zx/need_guidance_on_microservice_architecture/",
+          "pubDate": "2026-01-23T09:19:20.000Z",
+          "author": "/u/ResponsibleBabe6564",
+          "content": "<!-- SC_OFF --><div class=\"md\"><p>Heyy everyone, for my final year project I decided to build a simple application (chat-app). The idea itself is simple enough, but I realized pretty quickly that I don’t really have experience building a microservice architecture from scratch. Tbh, I haven’t even properly built one by following tutorials before, so I’m kind of learning this as I go. I tried creating an architecture diagram, data flow, and some rough database designs, but I’ve kind of hit a wall. I started reading stuff online about microservices, asking AI agents about service decoupling, async vs sync communication, etc. I understand the concepts individually, but I still can’t figure out what a <em>good enough</em> architecture would look like for a small uni project.</p> <p>I’m not asking for someone to design the whole architecture for me. I mostly want to understand:</p> <ul> <li>what <strong>patterns</strong> I should be using</li> <li>how to keep services <strong>properly decoupled</strong></li> <li>what I might be <strong>missing conceptually</strong></li> </ul> <p>Even pointing out 2–3 things I should focus on would help a lot. Blog posts, articles, or real-world examples would also be appreciated.</p> <p>Right now I’m especially confused about:</p> <ul> <li>storing user-related data (profile pic link, DOB, basic user info, ect)</li> <li>handling authentication and authorization <strong>across multiple microservices (very much leaning on doing the auth part on the API gateway itself, but still need some headsup for authorization for individual services)</strong></li> <li>auth-service should hold the user_data or no? And any other service that should have access to user-data other than userId (the only constant for now)</li> </ul> <p>Any advice is welcome. Thanks </p> <p>tech stack:- express, postgres, redis, rabbitmq, docker</p> <p>services:- for now just thinking of adding 5-6 services like relationship (tracking friendship/blocked status ect), presence-service, auth, logging, video call, media uploads ect</p> <p>for auth i want to keep it simple, just JWT, email, password login for user.</p> <p>Sorry if I sound ignorant about some of this, I’m still learning, but I genuinely want to build this project from scratch and have fun coding it.....</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://old.reddit.com/user/ResponsibleBabe6564\"> /u/ResponsibleBabe6564 </a> <br/> <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qkm7zx/need_guidance_on_microservice_architecture/\">[link]</a></span> &#32; <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qkm7zx/need_guidance_on_microservice_architecture/\">[comments]</a></span>",
+          "contentSnippet": "Heyy everyone, for my final year project I decided to build a simple application (chat-app). The idea itself is simple enough, but I realized pretty quickly that I don’t really have experience building a microservice architecture from scratch. Tbh, I haven’t even properly built one by following tutorials before, so I’m kind of learning this as I go. I tried creating an architecture diagram, data flow, and some rough database designs, but I’ve kind of hit a wall. I started reading stuff online about microservices, asking AI agents about service decoupling, async vs sync communication, etc. I understand the concepts individually, but I still can’t figure out what a good enough architecture would look like for a small uni project.\n I’m not asking for someone to design the whole architecture for me. I mostly want to understand:\n  \nwhat patterns I should be using\n how to keep services properly decoupled\n what I might be missing conceptually\n  \nEven pointing out 2–3 things I should focus on would help a lot. Blog posts, articles, or real-world examples would also be appreciated.\n Right now I’m especially confused about:\n  \nstoring user-related data (profile pic link, DOB, basic user info, ect)\n handling authentication and authorization across multiple microservices (very much leaning on doing the auth part on the API gateway itself, but still need some headsup for authorization for individual services)\n auth-service should hold the user_data or no? And any other service that should have access to user-data other than userId (the only constant for now)\n  \nAny advice is welcome. Thanks \n tech stack:- express, postgres, redis, rabbitmq, docker\n services:- for now just thinking of adding 5-6 services like relationship (tracking friendship/blocked status ect), presence-service, auth, logging, video call, media uploads ect\n for auth i want to keep it simple, just JWT, email, password login for user.\n Sorry if I sound ignorant about some of this, I’m still learning, but I genuinely want to build this project from scratch and have fun coding it.....\n    submitted by    /u/ResponsibleBabe6564  \n [link]   [comments]",
+          "id": "t3_1qkm7zx",
+          "isoDate": "2026-01-23T09:19:20.000Z"
+        },
+        "pairedItem": {
+          "item": 22
+        }
+      },
+      {
+        "json": {
+          "title": "Code Rabbit",
+          "link": "https://old.reddit.com/r/softwarearchitecture/comments/1qkufr9/code_rabbit/",
+          "pubDate": "2026-01-23T15:52:08.000Z",
+          "author": "/u/Zealousideal-Ad4026",
+          "content": "<!-- SC_OFF --><div class=\"md\"><p>Does anybody have actual feedback from using CodeRabbit? Im looking to evaluate it and see if anyone has actual experienc. </p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://old.reddit.com/user/Zealousideal-Ad4026\"> /u/Zealousideal-Ad4026 </a> <br/> <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qkufr9/code_rabbit/\">[link]</a></span> &#32; <span><a href=\"https://old.reddit.com/r/softwarearchitecture/comments/1qkufr9/code_rabbit/\">[comments]</a></span>",
+          "contentSnippet": "Does anybody have actual feedback from using CodeRabbit? Im looking to evaluate it and see if anyone has actual experienc. \n    submitted by    /u/Zealousideal-Ad4026  \n [link]   [comments]",
+          "id": "t3_1qkufr9",
+          "isoDate": "2026-01-23T15:52:08.000Z"
+        },
+        "pairedItem": {
+          "item": 23
+        }
+      }
+    ]
+  },
+  "connections": {
+    "reduce": {
+      "main": [
+        [
+          {
+            "node": "Simple Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hourly trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Feed": {
+      "main": [
+        [
+          {
+            "node": "Keep recent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s)": {
+      "main": [
+        [
+          {
+            "node": "Keep active rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Keep recent": {
+      "main": [
+        [
+          {
+            "node": "map-sort-limit-aggregate",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Update row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row(s)": {
+      "main": [
+        []
+      ]
+    },
+    "r/devops hot": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "HN best": {
+      "main": [
+        [
+          {
+            "node": "map-sort-limit-aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "r/softwarearchitecture hot": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "r/PromptEngineering hot": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "r/Biohackers hot": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "r/ZenHabits hot": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 5
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        []
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Llama 4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect the garbage": {
+      "main": [
+        [
+          {
+            "node": "Summarization Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarization Chain": {
+      "main": [
+        [
+          {
+            "node": "NTFY Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Keep Relevant",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Keep Discarded",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "map-sort-limit-aggregate": {
+      "main": [
+        [
+          {
+            "node": "TOON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TOON": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Keep active rows": {
+      "main": [
+        [
+          {
+            "node": "RSS Feed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Keep Relevant": {
+      "main": [
+        [
+          {
+            "node": "Call Send to NTFY",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Keep Discarded": {
+      "main": [
+        [
+          {
+            "node": "Collect the garbage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Llama 3.3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 1
+          },
+          {
+            "node": "Summarization Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "timeSavedPerExecution": 30,
+    "errorWorkflow": "mDyMPIBHtTcgf2TJ",
+    "timeSavedMode": "fixed",
+    "availableInMCP": false
+  },
+  "versionId": "6e952798-fea7-4496-9279-194d48f896a3",
+  "meta": {
+    "templateId": "joke_agent_with_http_tool",
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ce453c40118697428a9a886196749dd7351c0e64cf40f2be63003519ee6dbd5c"
+  },
+  "id": "rrHE4u9IpwxVh1np",
+  "tags": []
+}
