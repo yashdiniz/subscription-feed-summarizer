@@ -2,3 +2,5 @@ MEMD.md
 
 feeds.csv
 last_run.txt
+.env
+__pycache__
