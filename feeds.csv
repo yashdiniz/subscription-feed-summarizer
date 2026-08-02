@@ -1,2 +1,39 @@
 name,url,active
 yashdiniz.me blog,https://yashdiniz.me/feed.atom,True
+yashdiniz GH private,https://github.com/yashdiniz.private.atom?token=AGJDQRBBBYDST4D5PJWIEXOG5T4MM,True
+Huberman YT,https://www.youtube.com/feeds/videos.xml?channel_id=UC2D2CMWXMOVWx7giW1n3LIg,True
+Naval YT,https://www.youtube.com/feeds/videos.xml?channel_id=UCh_dVD10YuSghle8g6yjePg,True
+Mastering Backend Blog,https://masteringbackend.com/feed.xml,True
+Data Engineering Weekly,https://www.dataengineeringweekly.com/feed,True
+Meta Engineering Blog,https://engineering.fb.com/feed/,True
+Rudderstack DevSecOps Blog,https://www.rudderstack.com/blog/rss.xml,True
+The Human Upgrade Podcast YT,https://www.youtube.com/feeds/videos.xml?playlist_id=PLbqJqx1Hl3qYZVPCiduOLOMegrC8Zd2qn,True
+Getting Things Done (GTD) Blog,https://gettingthingsdone.com/feed/,True
+Precision Nutrition Blog,https://www.precisionnutrition.com/feed,True
+Structured Procrastination Blog,https://structuredprocrastination.com/blog/?feed=rss2,True
+Cloudflare Blog,https://blog.cloudflare.com/rss,True
+Google Research,https://research.google/blog/rss/,True
+TestDriven.io,https://testdriven.io/feed.xml,True
+Full Stack Python,https://www.fullstackpython.com/feed,True
+Netflix Tech Blog,https://netflixtechblog.com/feed,True
+Spotify Engineering Blog,https://engineering.atspotify.com/feed,True
+Technology Made Simple Blog - Substack,https://codinginterviewsmadesimple.substack.com/feed,True
+Artificial Intelligence Made Simple Blog - Substack,https://whatishappeningintechnology.substack.com/feed,True
+Namanyay's Blog,https://nmn.gl/blog/feed.xml,True
+GitHub Blog,https://github.blog/feed,True
+HN best,https://hnrss.org/best,True
+r/devops hot,https://old.reddit.com/r/devops/hot.rss,True
+r/softwarearchitecture hot,https://old.reddit.com/r/softwarearchitecture/hot.rss,True
+r/PromptEngineering hot,https://old.reddit.com/r/PromptEngineering/hot.rss,True
+r/AI_Agents hot,https://old.reddit.com/r/AI_Agents/hot.rss,True
+r/ClaudeCode hot,https://old.reddit.com/r/ClaudeCode/hot.rss,True
+r/PiCodingAgent hot,https://www.reddit.com/r/PiCodingAgent/hot.rss,True
+r/Biohackers hot,https://old.reddit.com/r/Biohackers/hot.rss,False
+r/ZenHabits hot,https://old.reddit.com/r/ZenHabits/hot.rss,False
+n8n blog,https://blog.n8n.io/rss/,False
+Hackernoon blog,https://hackernoon.com/feed,False
+SpringBoot Engineering,https://spring.io/blog/category/engineering.atom,False
+James Clear Blog,https://jamesclear.com/feed,False
+Scale Your App Newsletter,https://scaleyourapp.com/feed,False
+Hormozi YT,https://www.youtube.com/feeds/videos.xml?channel_id=UCUyDOdBWhC1MCxEjC46d-zw,False
+ThePrimeTime YT,https://www.youtube.com/feeds/videos.xml?channel_id=UCUyeluBRhGPCW4rPe_UvBZQ,False
