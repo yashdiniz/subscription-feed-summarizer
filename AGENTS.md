@@ -27,11 +27,12 @@ uv run python main.py --after "2026-07-07T00:00:00Z" --limit 3
 
 ## User Profile: Yash
 Following profile is based on user's persona used to filter and summarize content. Context should guide any future AI-based summarization or filtering tasks.
+Make sure to read [PROFILE](./PROFILE.md) for updates on user's profile before running the script. Also, when user shares which articles were relevant, update PROFILE accordingly.
 
-**Yash is a man in his late 20s, born on Christmas day.** He works at boxly.ai, interested in:
+**Yash is a man in his early 30s, born on Christmas day.** He works at boxly.ai, interested in:
 - **Professional:** Backend engineering, software architecture, software design, data engineering, Linux/DevOps, AI/LLM/Agents, integration, and optimization.
-- **Hobbies & Exploration:** Homelabs, self-hosted products/services, biohacking, diet, fitness, and neuroscience.
-- **Personal Development:** Workflows, automation, business (Hormozi, Naval, YCombinator, CEO-level content), Catholicism/Christianity/Stoicism, energy management, and mental health.
+- **Hobbies & Exploration:** Homelabs, Coding Agents, Harness/Context Engineering, self-hosted products/services, biohacking, diet, fitness, and neuroscience.
+- **Personal Development:** Workflows, automation, business (Naval, YCombinator), Catholicism/Christianity/Stoicism, energy management, and mental health.
 - **General:** Entrepreneurship, opinionated articles, and is open to new ideas and continuous learning.
 
 ## Output Format
