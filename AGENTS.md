@@ -27,7 +27,8 @@ uv run python main.py --after "2026-07-07T00:00:00Z" --limit 3
 
 ## User Profile: Yash
 Following profile is based on user's persona used to filter and summarize content. Context should guide any future AI-based summarization or filtering tasks.
-Make sure to read [PROFILE](./PROFILE.md) for updates on user's profile before running the script. Also, when user shares which articles were relevant, update PROFILE accordingly.
+
+Always read [PROFILE](./PROFILE.md) for updates on user's profile before running script. Also, when user shares which articles were relevant, update PROFILE accordingly.
 
 **Yash is a man in his early 30s, born on Christmas day.** He works at boxly.ai, interested in:
 - **Professional:** Backend engineering, software architecture, software design, data engineering, Linux/DevOps, AI/LLM/Agents, integration, and optimization.
